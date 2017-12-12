@@ -51,18 +51,11 @@ from keras.layers import Dense
 
 classifier = Sequential()
 
-#1st Layer
-classifier.add(Dense(output_dim=6, input_dim=10))
+#input layer Layer
+classifier.add(Dense(output_dim=6, init= 'uniform', activation= 'relu', input_dim=10))
 
 #2nd layer
-classifier.add(Dense(output_dim=6))
-
-#output layer
-classifier.add(Dense(output_dim=1))
-classifier.add(Dense(output_dim=6, init = 'uniform', activation= 'linear', input_dim=11))
-
-#2nd layer
-classifier.add(Dense(output_dim=6, init = 'uniform', activation= 'linear'))
+classifier.add(Dense(output_dim=6, init= 'uniform', activation= 'relu'))
 
 #output layer
 classifier.add(Dense(output_dim=1, init = 'uniform', activation= 'sigmoid'))
@@ -94,17 +87,7 @@ test['start_date'] = test['start_date'] - min_date
 test['creation_date'] = test['creation_date'] - min_date
 test['sell_date'] = test['sell_date'] - min_date
 
-y_pred = classifier.predict(test)
-y_pred = classifier.predict_proba(test)
-
-
-
-
-
-
-
-
-
 
 
 #predicting the test results
+y_pred = classifier.predict(test)
