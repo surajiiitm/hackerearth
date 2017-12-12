@@ -6,6 +6,7 @@ Created on Mon Dec  4 16:27:27 2017
 """
 
 import pandas as pd
+import sklearn
 
 ttrain = pd.read_csv("train.csv")
 train = ttrain[['portfolio_id', 'pf_category', 'start_date', 'sold', 'country_code', 'euribor_rate', 'currency', 'libor_rate', 'bought', 'creation_date', 'sell_date', 'type', 'return']]
@@ -39,8 +40,9 @@ xtrain['currency'] = le.fit_transform(xtrain['currency'])
 xtrain.drop('portfolio_id', axis=1, inplace=True)
 
 
-enc = OneHotEncoder(categorical_features = [6])
-xtrain = enc.fit_transform(xtrain).toarray()
+from sklearn.preprocessing import OneHotEncoder
+enc = OneHotEncoder(categorical_features = [10])
+xtrain = enc.fit_transform(xtrain)
 
 #keras and it's library import
 import keras
@@ -57,11 +59,18 @@ classifier.add(Dense(output_dim=6))
 
 #output layer
 classifier.add(Dense(output_dim=1))
+classifier.add(Dense(output_dim=6, init = 'uniform', activation= 'linear', input_dim=11))
+
+#2nd layer
+classifier.add(Dense(output_dim=6, init = 'uniform', activation= 'linear'))
+
+#output layer
+classifier.add(Dense(output_dim=1, init = 'uniform', activation= 'sigmoid'))
 
 #compiling the ANN
-classifier.compile(optimizer='adam', loss='binary_crossentropy', metrics= ['accuracy'])
+classifier.compile(optimizer='adam', loss='mean_squared_error', metrics= ['accuracy'])
 
-
+classifier.get_config
 #date conversion from minimum
 min_date = xtrain['start_date'].min()
 xtrain['start_date'] = xtrain['start_date'] - min_date
@@ -69,7 +78,7 @@ xtrain['creation_date'] = xtrain['creation_date'] - min_date
 xtrain['sell_date'] = xtrain['sell_date'] - min_date
 
 #fiting the ANN to the training set
-classifier.fit(xtrain, ytrain, batch_size=10,  epochs=100)
+classifier.fit(xtrain, ytrain, batch_size=10,  epochs=50)
 
 #making the prediction and evaluating model
 test = pd.read_csv("test.csv")
@@ -86,6 +95,7 @@ test['creation_date'] = test['creation_date'] - min_date
 test['sell_date'] = test['sell_date'] - min_date
 
 y_pred = classifier.predict(test)
+y_pred = classifier.predict_proba(test)
 
 
 
@@ -96,6 +106,5 @@ y_pred = classifier.predict(test)
 
 
 
-y_pred = classifier.predict()
 
 #predicting the test results
